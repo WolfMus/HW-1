@@ -32,7 +32,10 @@ type FieldErrorType = {
   field: string;
 };
 
-type ApiResponse = { errorsMessages: FieldErrorType[] } | VideoType[] | VideoType;
+type ApiResponse =
+  | { errorsMessages: FieldErrorType[] }
+  | VideoType[]
+  | VideoType;
 
 let videos: VideoType[] = [];
 
@@ -116,7 +119,7 @@ app.get(
   (req: Request<{ videoId: string }>, res: Response) => {
     const videoId = req.params.videoId;
     if (!videoId) {
-      return res.status(400).json({ error: "Video ID is required" });
+      return res.sendStatus(404);
     }
     const id = +videoId;
 
@@ -141,8 +144,8 @@ app.put(
       { id: string },
       {},
       {
-        title: "string";
-        author: "string";
+        title: "string" | null;
+        author: "string" | null;
         AvailableResolutions: AvailableResolutions[];
         canBeDownloaded: "boolean";
         minAgeRestriction: "number";

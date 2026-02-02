@@ -5,7 +5,7 @@ import { setupApp } from "./setup-app";
 const app = express();
 setupApp(app);
 
-const enum availableResolutions {
+const enum AvailableResolutions {
   P144 = "P144",
   P240 = "P240",
   P360 = "P360",
@@ -16,7 +16,7 @@ const enum availableResolutions {
   P2160 = "P2160",
 }
 
-type videoType = {
+type VideoType = {
   id: number;
   title: string;
   author: string;
@@ -24,13 +24,20 @@ type videoType = {
   minAgeRestriction: number | null;
   createdAt: string;
   publicationDate: string;
-  availableResolutions: availableResolutions[];
+  availableResolutions: AvailableResolutions[];
 };
 
-let videos: videoType[] = [];
+type FieldErrorType = {
+  message: string;
+  field: string;
+};
+
+type ApiResponse = { errorsMessages: FieldErrorType[] } | VideoType[] | VideoType;
+
+let videos: VideoType[] = [];
 
 // clear data for testing
-app.delete("/testing/all-data", (req: Request<{}>, res: Response) => {
+app.delete("/testing/all-data", (req, res: Response<ApiResponse>) => {
   videos = [];
   res.status(204).send(videos);
 });
@@ -38,7 +45,7 @@ app.delete("/testing/all-data", (req: Request<{}>, res: Response) => {
 //returns all videos
 app.get(
   "/videos",
-  (req: Request<{}, {}, {}, {}>, res: Response<videoType[]>) => {
+  (req: Request<{}, {}, {}, {}>, res: Response<ApiResponse>) => {
     res.status(200).send(videos);
   },
 );
@@ -53,10 +60,10 @@ app.post(
       {
         title: "string";
         author: "string";
-        availableResolutions: availableResolutions[];
+        AvailableResolutions: AvailableResolutions[];
       }
     >,
-    res: Response,
+    res: Response<ApiResponse>,
   ) => {
     const title = req.body.title;
     if (!title || typeof title !== "string" || title.length > 40) {
@@ -95,7 +102,7 @@ app.post(
       minAgeRestriction: null,
       createdAt: dateNow.toISOString(),
       publicationDate: dateDefault.toISOString(),
-      availableResolutions: req.body.availableResolutions,
+      availableResolutions: req.body.AvailableResolutions,
     };
 
     videos.push(newVideo);
@@ -106,7 +113,7 @@ app.post(
 //Return video by id
 app.get(
   "/videos/:videoId",
-  (req: Request<{ videoId: string }>, res: Response) => {
+  (req: Request<{ videoId: string }>, res) => {
     const videoId = req.params.videoId;
     if (!videoId) {
       return res.status(400).json({ error: "Video ID is required" });
@@ -136,13 +143,13 @@ app.put(
       {
         title: "string";
         author: "string";
-        availableResolutions: availableResolutions[];
+        AvailableResolutions: AvailableResolutions[];
         canBeDownloaded: "boolean";
         minAgeRestriction: "number";
         publicationDate: "string";
       }
     >,
-    res: Response,
+    res: Response<ApiResponse>,
   ) => {
     const title = req.body.title;
     if (!title || typeof title !== "string" || title.length > 40) {
@@ -170,7 +177,7 @@ app.put(
       return;
     }
 
-    const resolution = req.body.availableResolutions;
+    const resolution = req.body.AvailableResolutions;
     if (!resolution) {
       res.status(400).send({
         errorsMessages: [
@@ -256,7 +263,6 @@ app.delete(
     const id = +req.params.videoId!;
     const newVideo = videos.filter((v) => v.id !== id);
     if (newVideo.length < videos.length) {
-      videos = newVideo;
       res.sendStatus(204);
     } else {
       res.sendStatus(404);

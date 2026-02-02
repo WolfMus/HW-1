@@ -37,7 +37,7 @@ type ApiResponse = { errorsMessages: FieldErrorType[] } | VideoType[] | VideoTyp
 let videos: VideoType[] = [];
 
 // clear data for testing
-app.delete("/testing/all-data", (req, res: Response<ApiResponse>) => {
+app.delete("/testing/all-data", (req, res) => {
   videos = [];
   res.status(204).send(videos);
 });
@@ -45,7 +45,7 @@ app.delete("/testing/all-data", (req, res: Response<ApiResponse>) => {
 //returns all videos
 app.get(
   "/videos",
-  (req: Request<{}, {}, {}, {}>, res: Response<ApiResponse>) => {
+  (req: Request<{}, {}, {}, {}>, res: Response<VideoType[]>) => {
     res.status(200).send(videos);
   },
 );
@@ -113,7 +113,7 @@ app.post(
 //Return video by id
 app.get(
   "/videos/:videoId",
-  (req: Request<{ videoId: string }>, res) => {
+  (req: Request<{ videoId: string }>, res: Response) => {
     const videoId = req.params.videoId;
     if (!videoId) {
       return res.status(400).json({ error: "Video ID is required" });

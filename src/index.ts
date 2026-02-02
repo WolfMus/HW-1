@@ -15,7 +15,7 @@ const availableResolutions = {
   P1440: "P1440",
   P2160: "P2160",
 };
-const videos = [
+let videos = [
   {
     id: 0,
     title: "string",
@@ -27,6 +27,12 @@ const videos = [
     availableResolutions: ["P144"],
   },
 ];
+
+// clear data for testing
+app.delete("/testing/all-data", (req: Request, res: Response) => {
+  videos = [];
+  res.status(204).send(videos);
+})
 
 //returns all videos
 app.get("/videos", (req: Request, res: Response) => {
@@ -79,30 +85,130 @@ app.post("/videos", (req: Request, res: Response) => {
 //Return video by id
 app.get("/videos/:videoId", (req: Request, res: Response) => {
   const videoId = req.params.videoId;
-
   if (!videoId) {
+    return res.status(400).json({ error: "Video ID is required" });
+  }
+  const id = +videoId;
+
+  if (isNaN(id)) {
     return res.sendStatus(404);
   }
 
-  const id = +videoId
   const video = videos.find((v) => v.id === id);
   if (video) {
-    res.status(200);
+    res.sendStatus(200);
   } else {
-    res.status(404);
+    res.sendStatus(404);
   }
 });
 
+// update video by id
+app.put("/videos/:id", (req: Request, res: Response) => {
+  const title = req.body.title;
+  if (!title || typeof title !== "string" || title.length > 40) {
+    res.status(400).send({
+      errorsMessages: [
+        {
+          message: "Incorrect input title",
+          field: "title",
+        },
+      ],
+    });
+    return;
+  }
 
-app.delete("/video/:videoId", (req: Request<{'string'}>, res: Response) => {
-  const id = +req.params.videoId;
-  const newVideo = videos.filter((v) => v.id !== id)
+  const author = req.body.author;
+  if (!author || typeof author !== "string" || author.length > 20) {
+    res.status(400).send({
+      errorsMessages: [
+        {
+          message: "Incorrect input author name",
+          field: "author",
+        },
+      ],
+    });
+    return;
+  }
+
+  const resolution = req.body.availableResolutions;
+  if (!resolution) {
+    res.status(400).send({
+      errorsMessages: [
+        {
+          message: "At least one resolution should be added",
+          field: "availableResolution",
+        },
+      ],
+    });
+  }
+
+  const download = req.body.canBeDownloaded;
+  if (typeof download !== "boolean") {
+    res.status(400).send({
+      errorsMessages: [
+        {
+          message: "Not boolean",
+          field: "canBeDownloaded",
+        },
+      ],
+    });
+  }
+
+  const ageRestriction = req.body.minAgeRestriction;
+  if (
+    ageRestriction < 1 ||
+    ageRestriction > 18 ||
+    typeof ageRestriction !== "number"
+  ) {
+    res.status(400).send({
+      errorsMessages: [
+        {
+          message: "Incorrect input minAgeRestriction value",
+          field: "minAgeRestriction",
+        },
+      ],
+    });
+  }
+
+  const publicationDate = req.body.publicationDate;
+  if (publicationDate !== 'string' || !publicationDate.trim()) {
+      res.status(400).send({
+      errorsMessages: [
+        {
+          message: "Incorrect input publicationDate value",
+          field: "publicationDate",
+        },
+      ],
+    });
+  }
+
+  const id = +req.params.id!;
+  const video = videos.find((v) => v.id === id);
+  if (video) {
+    video.title = title;
+    video.author = author;
+    video.availableResolutions = resolution;
+    video.canBeDownloaded = download;
+    video.minAgeRestriction = ageRestriction;
+    video.publicationDate = publicationDate;
+    res.sendStatus(204);
+  } else {
+    res.sendStatus(404);
+  }
+});
+
+// delete video by id
+app.delete("/videos/:videoId", (req: Request, res: Response) => {
+  const id = +req.params.videoId!;
+  const newVideo = videos.filter((v) => v.id !== id);
   if (newVideo.length < videos.length) {
-    res.status(204);
+    videos = newVideo;
+    res.sendStatus(204);
   } else {
-    res.status(404);
+    res.sendStatus(404);
   }
 });
+
 //порт приложения
 const PORT = process.env.PORT || 5001;
 

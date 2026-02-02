@@ -91,7 +91,7 @@ app.post(
       id: videos.length,
       title: req.body.title,
       author: req.body.author,
-      canBeDownloaded: true,
+      canBeDownloaded: false,
       minAgeRestriction: null,
       createdAt: dateNow.toISOString(),
       publicationDate: dateDefault.toISOString(),

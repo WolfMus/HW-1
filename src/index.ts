@@ -119,7 +119,7 @@ app.get(
 
     const video = videos.find((v) => v.id === id);
     if (video) {
-      res.sendStatus(200);
+      res.status(200).send(video);
     } else {
       res.sendStatus(404);
     }

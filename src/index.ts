@@ -18,8 +18,8 @@ const enum AvailableResolutions {
 
 type VideoType = {
   id: number;
-  title: string;
-  author: string;
+  title: string | null;
+  author: string | null;
   canBeDownloaded: boolean;
   minAgeRestriction: number | null;
   createdAt: string;
@@ -46,12 +46,9 @@ app.delete("/testing/all-data", (req, res) => {
 });
 
 //returns all videos
-app.get(
-  "/videos",
-  (req: Request<{}, {}, {}, {}>, res: Response<VideoType[]>) => {
-    res.status(200).send(videos);
-  },
-);
+app.get("/videos", (req, res: Response<VideoType[]>) => {
+  res.status(200).send(videos);
+});
 
 // create new video
 app.post(
@@ -61,9 +58,9 @@ app.post(
       {},
       {},
       {
-        title: "string";
-        author: "string";
-        AvailableResolutions: AvailableResolutions[];
+        title: string | null;
+        author: string | null;
+        availableResolutions: AvailableResolutions[];
       }
     >,
     res: Response<ApiResponse>,
@@ -95,19 +92,19 @@ app.post(
     }
 
     const dateNow = new Date();
+    console.log(dateNow);
     const dateDefault = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
     const newVideo = {
-      id: videos.length,
+      id: Date.now(),
       title: req.body.title,
       author: req.body.author,
       canBeDownloaded: false,
       minAgeRestriction: null,
       createdAt: dateNow.toISOString(),
       publicationDate: dateDefault.toISOString(),
-      availableResolutions: req.body.AvailableResolutions,
+      availableResolutions: req.body.availableResolutions,
     };
-
     videos.push(newVideo);
     res.status(201).send(newVideo);
   },
@@ -144,12 +141,12 @@ app.put(
       { id: string },
       {},
       {
-        title: "string" | null;
-        author: "string" | null;
-        AvailableResolutions: AvailableResolutions[];
-        canBeDownloaded: "boolean";
-        minAgeRestriction: "number";
-        publicationDate: "string";
+        title: string | null;
+        author: string | null;
+        availableResolutions: AvailableResolutions[];
+        canBeDownloaded: boolean;
+        minAgeRestriction: number;
+        publicationDate: string;
       }
     >,
     res: Response<ApiResponse>,
@@ -180,7 +177,7 @@ app.put(
       return;
     }
 
-    const resolution = req.body.AvailableResolutions;
+    const resolution = req.body.availableResolutions;
     if (!resolution) {
       res.status(400).send({
         errorsMessages: [
@@ -266,6 +263,7 @@ app.delete(
     const id = +req.params.videoId!;
     const newVideo = videos.filter((v) => v.id !== id);
     if (newVideo.length < videos.length) {
+      videos = newVideo;
       res.sendStatus(204);
     } else {
       res.sendStatus(404);

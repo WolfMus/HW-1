@@ -32,7 +32,7 @@ let videos = [
 app.delete("/testing/all-data", (req: Request, res: Response) => {
   videos = [];
   res.status(204).send(videos);
-})
+});
 
 //returns all videos
 app.get("/videos", (req: Request, res: Response) => {
@@ -67,14 +67,17 @@ app.post("/videos", (req: Request, res: Response) => {
     return;
   }
 
+  const dateNow = new Date();
+  const dateDefault = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
   const newVideo = {
     id: videos.length,
     title: req.body.title,
     author: req.body.author,
     canBeDownloaded: true,
     minAgeRestriction: null,
-    createdAt: new Date().toISOString(),
-    publicationDate: new Date().toISOString(),
+    createdAt: dateNow.toISOString(),
+    publicationDate: dateDefault.toISOString(),
     availableResolutions: req.body.availableResolutions,
   };
 
@@ -171,8 +174,8 @@ app.put("/videos/:id", (req: Request, res: Response) => {
   }
 
   const publicationDate = req.body.publicationDate;
-  if (publicationDate !== 'string' || !publicationDate.trim()) {
-      res.status(400).send({
+  if (publicationDate !== "string" || !publicationDate.trim()) {
+    res.status(400).send({
       errorsMessages: [
         {
           message: "Incorrect input publicationDate value",

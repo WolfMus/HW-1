@@ -122,8 +122,7 @@ app.post(
     }
 
     const dateNow = new Date();
-    console.log(dateNow);
-    const dateDefault = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const dateDefault = new Date(dateNow.getTime() + 24 * 60 * 60 * 1000);
 
     const newVideo = {
       id: Date.now(),

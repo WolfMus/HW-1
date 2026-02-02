@@ -93,9 +93,25 @@ app.post(
       //   ],
       // });
       errors.push({
-            message: "Incorrect input author name",
-            field: "author",
-      })
+        message: "Incorrect input author name",
+        field: "author",
+      });
+    }
+
+    const resolution = req.body.availableResolutions;
+    if (!resolution) {
+      errors.push({
+        message: "At least one resolution should be added",
+        field: "availableResolution",
+      });
+      // res.status(400).send({
+      //   errorsMessages: [
+      //     {
+      //       message: "At least one resolution should be added",
+      //       field: "availableResolution",
+      //     },
+      //   ],
+      // });
     }
 
     if (errors.length > 0) {
@@ -117,7 +133,7 @@ app.post(
       minAgeRestriction: null,
       createdAt: dateNow.toISOString(),
       publicationDate: dateDefault.toISOString(),
-      availableResolutions: req.body.availableResolutions,
+      availableResolutions: resolution,
     };
     videos.push(newVideo);
     res.status(201).send(newVideo);

@@ -242,7 +242,7 @@ app.put(
       video.canBeDownloaded = download;
       video.minAgeRestriction = ageRestriction;
       video.publicationDate = publicationDate;
-      res.sendStatus(204);
+      res.status(204).send(video);
     } else {
       res.sendStatus(404);
     }

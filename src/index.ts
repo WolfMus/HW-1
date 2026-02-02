@@ -65,28 +65,42 @@ app.post(
     >,
     res: Response<ApiResponse>,
   ) => {
+    const errors: FieldErrorType[] = [];
+
     const title = req.body.title;
     if (!title || typeof title !== "string" || title.length > 40) {
-      res.status(400).send({
-        errorsMessages: [
-          {
-            message: "Incorrect input title",
-            field: "title",
-          },
-        ],
+      // res.status(400).send({
+      //   errorsMessages: [
+      //     {
+      //       message: "Incorrect input title",
+      //       field: "title",
+      //     },
+      //   ],
+      errors.push({
+        message: "Incorrect input title",
+        field: "title",
       });
-      return;
     }
 
     const author = req.body.author;
     if (!author || typeof author !== "string" || author.length > 20) {
-      res.status(400).send({
-        errorsMessages: [
-          {
+      // res.status(400).send({
+      //   errorsMessages: [
+      //     {
+      //       message: "Incorrect input author name",
+      //       field: "author",
+      //     },
+      //   ],
+      // });
+      errors.push({
             message: "Incorrect input author name",
             field: "author",
-          },
-        ],
+      })
+    }
+
+    if (errors.length > 0) {
+      res.status(400).send({
+        errorsMessages: errors,
       });
       return;
     }

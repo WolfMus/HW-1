@@ -84,11 +84,23 @@ app.post(
     }
 
     const resolution = req.body.availableResolutions;
-    if (!resolution) {
+    if (!resolution || resolution.length === 0) {
       errors.push({
-        message: "At least one resolution should be added",
+        message: "At least one correct resolution should be added",
         field: "availableResolutions",
       });
+    } else {
+      const validResolutions = Object.values(AvailableResolutions);
+
+      for (const res of resolution) {
+        if (!validResolutions.includes(res)) {
+          errors.push({
+            message: "Invalid resolution",
+            field: "availableResolutions",
+          });
+          break;
+        }
+      }
     }
 
     if (errors.length > 0) {

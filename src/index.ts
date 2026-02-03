@@ -1,6 +1,5 @@
 import express, { Request, Response } from "express";
 import { setupApp } from "./setup-app";
-import { registerHooks } from "node:module";
 
 //создание приложения
 const app = express();
@@ -69,27 +68,26 @@ app.post(
     const errors: FieldErrorType[] = [];
 
     const title = req.body.title;
-      if (!title || typeof title !== "string" || title.length > 40) {
-        errors.push({
-          message: "Incorrect input title",
-          field: "title",
-        });
-      }
-
+    if (!title || typeof title !== "string" || title.length > 40) {
+      errors.push({
+        message: "Incorrect input title",
+        field: "title",
+      });
+    }
 
     const author = req.body.author;
-      if (!author || typeof author !== "string" || author.length > 20) {
-        errors.push({
-          message: "Incorrect input author name",
-          field: "author",
-        });
-      }
+    if (!author || typeof author !== "string" || author.length > 20) {
+      errors.push({
+        message: "Incorrect input author name",
+        field: "author",
+      });
+    }
 
     const resolution = req.body.availableResolutions;
     if (!resolution) {
       errors.push({
         message: "At least one resolution should be added",
-        field: "availableResolution",
+        field: "availableResolutions",
       });
     }
 
@@ -160,31 +158,38 @@ app.put(
     res: Response<ApiResponse>,
   ) => {
     const errors: FieldErrorType[] = [];
+
     const title = req.body.title;
-    if (title !== null) {
-      if (!title || typeof title !== "string" || title.length > 40) {
-        errors.push({
-          message: "Incorrect input title",
-          field: "title",
-        });
-      }
+    if (title === null || typeof title !== "string") {
+      errors.push({
+        message: "Incorrect input title",
+        field: "title",
+      });
+    } else if (title.trim().length === 0 || title.length > 40) {
+      errors.push({
+        message: "Incorrect input title",
+        field: "title",
+      });
     }
 
     const author = req.body.author;
-    if (author !== null) {
-      if (!author || typeof author !== "string" || author.length > 20) {
-        errors.push({
-          message: "Incorrect input author name",
-          field: "author",
-        });
-      }
+    if (author === null || typeof author !== "string") {
+      errors.push({
+        message: "Incorrect input author name",
+        field: "author",
+      });
+    } else if (author.trim().length === 0 || author.length > 20) {
+      errors.push({
+        message: "Incorrect input author name",
+        field: "author",
+      });
     }
 
     const resolution = req.body.availableResolutions;
-    if (resolution.length === 0) {
+    if (!resolution || resolution.length === 0) {
       errors.push({
         message: "At least one correct resolution should be added",
-        field: "availableResolution",
+        field: "availableResolutions",
       });
     } else {
       const validResolutions = Object.values(AvailableResolutions);
@@ -193,8 +198,9 @@ app.put(
         if (!validResolutions.includes(res)) {
           errors.push({
             message: "Invalid resolution",
-            field: "availableResolution",
+            field: "availableResolutions",
           });
+          break;
         }
       }
     }
@@ -245,7 +251,7 @@ app.put(
       video.canBeDownloaded = download;
       video.minAgeRestriction = ageRestriction;
       video.publicationDate = publicationDate;
-      res.status(204).send(video);
+      res.sendStatus(204);
     } else {
       res.sendStatus(404);
     }

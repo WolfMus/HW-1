@@ -1,11 +1,12 @@
 import express, { Request, Response } from "express";
 import { setupApp } from "./setup-app";
+import { registerHooks } from "node:module";
 
 //создание приложения
 const app = express();
 setupApp(app);
 
-const enum AvailableResolutions {
+enum AvailableResolutions {
   P144 = "P144",
   P240 = "P240",
   P360 = "P360",
@@ -68,19 +69,23 @@ app.post(
     const errors: FieldErrorType[] = [];
 
     const title = req.body.title;
-    if (!title || typeof title !== "string" || title.length > 40) {
-      errors.push({
-        message: "Incorrect input title",
-        field: "title",
-      });
+    if (title !== null) {
+      if (!title || typeof title !== "string" || title.length > 40) {
+        errors.push({
+          message: "Incorrect input title",
+          field: "title",
+        });
+      }
     }
 
     const author = req.body.author;
-    if (!author || typeof author !== "string" || author.length > 20) {
-      errors.push({
-        message: "Incorrect input author name",
-        field: "author",
-      });
+    if (author !== null) {
+      if (!author || typeof author !== "string" || author.length > 20) {
+        errors.push({
+          message: "Incorrect input author name",
+          field: "author",
+        });
+      }
     }
 
     const resolution = req.body.availableResolutions;
@@ -151,7 +156,7 @@ app.put(
         author: string | null;
         availableResolutions: AvailableResolutions[];
         canBeDownloaded: boolean;
-        minAgeRestriction: number;
+        minAgeRestriction: number | null;
         publicationDate: string;
       }
     >,
@@ -159,27 +164,42 @@ app.put(
   ) => {
     const errors: FieldErrorType[] = [];
     const title = req.body.title;
-    if (!title || typeof title !== "string" || title.length > 40) {
-      errors.push({
-        message: "Incorrect input title",
-        field: "title",
-      });
+    if (title !== null) {
+      if (!title || typeof title !== "string" || title.length > 40) {
+        errors.push({
+          message: "Incorrect input title",
+          field: "title",
+        });
+      }
     }
 
     const author = req.body.author;
-    if (!author || typeof author !== "string" || author.length > 20) {
-      errors.push({
-        message: "Incorrect input author name",
-        field: "author",
-      });
+    if (author !== null) {
+      if (!author || typeof author !== "string" || author.length > 20) {
+        errors.push({
+          message: "Incorrect input author name",
+          field: "author",
+        });
+      }
     }
 
     const resolution = req.body.availableResolutions;
-    if (!resolution) {
+    if (resolution.length === 0) {
       errors.push({
-        message: "At least one resolution should be added",
+        message: "At least one correct resolution should be added",
         field: "availableResolution",
       });
+    } else {
+      const validResolutions = Object.values(AvailableResolutions);
+
+      for (const res of resolution) {
+        if (!validResolutions.includes(res)) {
+          errors.push({
+            message: "Invalid resolution",
+            field: "availableResolution",
+          });
+        }
+      }
     }
 
     const download = req.body.canBeDownloaded;
@@ -191,18 +211,17 @@ app.put(
     }
 
     const ageRestriction = req.body.minAgeRestriction;
-    if (ageRestriction !== null && typeof ageRestriction !== "number") {
-      errors.push({
-        message: "Not boolean",
-        field: "canBeDownloaded",
-      });
-    }
-
-    if (ageRestriction < 1 || ageRestriction > 18) {
-      errors.push({
-        message: "Not boolean",
-        field: "canBeDownloaded",
-      });
+    if (ageRestriction !== null) {
+      if (
+        typeof ageRestriction !== "number" ||
+        ageRestriction < 1 ||
+        ageRestriction > 18
+      ) {
+        errors.push({
+          message: "Invalid input",
+          field: "minAgeRestriction",
+        });
+      }
     }
 
     const publicationDate = req.body.publicationDate;
@@ -212,7 +231,7 @@ app.put(
         field: "publicationDate",
       });
     }
-    
+
     if (errors.length > 0) {
       res.status(400).send({
         errorsMessages: errors,

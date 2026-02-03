@@ -59,8 +59,8 @@ app.post(
       {},
       {},
       {
-        title: string | null;
-        author: string | null;
+        title: string;
+        author: string;
         availableResolutions: AvailableResolutions[];
       }
     >,
@@ -69,24 +69,21 @@ app.post(
     const errors: FieldErrorType[] = [];
 
     const title = req.body.title;
-    if (title !== null) {
       if (!title || typeof title !== "string" || title.length > 40) {
         errors.push({
           message: "Incorrect input title",
           field: "title",
         });
       }
-    }
+
 
     const author = req.body.author;
-    if (author !== null) {
       if (!author || typeof author !== "string" || author.length > 20) {
         errors.push({
           message: "Incorrect input author name",
           field: "author",
         });
       }
-    }
 
     const resolution = req.body.availableResolutions;
     if (!resolution) {

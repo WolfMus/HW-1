@@ -1,8 +1,9 @@
 import express, { Request, Response } from "express";
 import { setupApp } from "./setup-app";
+import { RequestWithBody, RequestWithParams, RequestWithParamsAndBody } from "./types";
 
 //создание приложения
-const app = express();
+export const app = express();
 setupApp(app);
 
 enum AvailableResolutions {
@@ -51,20 +52,13 @@ app.get("/videos", (req, res: Response<VideoType[]>) => {
 });
 
 // create new video
-app.post(
-  "/videos",
-  (
-    req: Request<
-      {},
-      {},
-      {
-        title: string;
-        author: string;
-        availableResolutions: AvailableResolutions[];
-      }
-    >,
-    res: Response<ApiResponse>,
-  ) => {
+app.post("/videos",(req: RequestWithBody<{
+                        title: string;
+                        author: string;
+                        availableResolutions: AvailableResolutions[];
+                        }>, 
+                    res: Response<ApiResponse>,) => {
+
     const errors: FieldErrorType[] = [];
 
     const title = req.body.title;
@@ -131,7 +125,7 @@ app.post(
 //Return video by id
 app.get(
   "/videos/:videoId",
-  (req: Request<{ videoId: string }>, res: Response) => {
+  (req: RequestWithParams<{ videoId: string }>, res: Response) => {
     const videoId = req.params.videoId;
     if (!videoId) {
       return res.sendStatus(404);
@@ -152,12 +146,8 @@ app.get(
 );
 
 // update video by id
-app.put(
-  "/videos/:id",
-  (
-    req: Request<
+app.put("/videos/:id", (req: RequestWithParamsAndBody<
       { id: string },
-      {},
       {
         title: string | null;
         author: string | null;
@@ -271,9 +261,8 @@ app.put(
 );
 
 // delete video by id
-app.delete(
-  "/videos/:videoId",
-  (req: Request<{ videoId: string }>, res: Response) => {
+app.delete("/videos/:videoId",
+  (req: RequestWithParams<{ videoId: string }>, res: Response) => {
     const id = +req.params.videoId!;
     const newVideo = videos.filter((v) => v.id !== id);
     if (newVideo.length < videos.length) {

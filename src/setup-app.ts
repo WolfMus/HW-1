@@ -11,6 +11,8 @@ import { FieldErrorType } from "./videos/types/types/validationError";
 import { createErrorMessage } from "./core/utils/error.utils";
 import { videoInputDtoValidation } from "./videos/types/validation/videoInputDtoValidation";
 import { videoUpdateInputDtoValidation } from "./videos/types/validation/videoUpdateInputDtoValidation";
+import { VideoInputDto } from "./videos/types/dto/video.input-dto";
+import { VideoUpdateInputDto } from "./videos/types/dto/video.update-dto";
 
 export const setupApp = (app: Express) => {
   app.use(express.json()); //middleware для парсинга JSON в теле запроса
@@ -37,16 +39,8 @@ export const setupApp = (app: Express) => {
   });
 
   // create new video
-  app.post(
-    "/videos",
-    (
-      req: RequestWithBody<{
-        title: string;
-        author: string;
-        availableResolutions: AvailableResolutions[];
-      }>,
-      res: Response<ApiResponse>,
-    ) => {
+  app.post("/videos", ( req: RequestWithBody<VideoInputDto>, res: Response<ApiResponse> ) => {
+
       const errors = videoInputDtoValidation(req.body);
 
       if (errors.length > 0) {
@@ -73,9 +67,7 @@ export const setupApp = (app: Express) => {
   );
 
   //Return video by id
-  app.get(
-    "/videos/:videoId",
-    (req: RequestWithParams<{ videoId: string }>, res: Response) => {
+  app.get("/videos/:videoId", (req: RequestWithParams<{ videoId: string }>, res: Response) => {
       const videoId = req.params.videoId;
       if (!videoId) {
         return res.sendStatus(HttpStatus.NotFound);
@@ -96,22 +88,7 @@ export const setupApp = (app: Express) => {
   );
 
   // update video by id
-  app.put(
-    "/videos/:id",
-    (
-      req: RequestWithParamsAndBody<
-        { id: string },
-        {
-          title: string | null;
-          author: string | null;
-          availableResolutions: AvailableResolutions[];
-          canBeDownloaded: boolean;
-          minAgeRestriction: number | null;
-          publicationDate: string;
-        }
-      >,
-      res: Response<ApiResponse>,
-    ) => {
+  app.put("/videos/:id",( req: RequestWithParamsAndBody< { id: string }, VideoUpdateInputDto >, res: Response<ApiResponse>, ) => {
       const errors = videoUpdateInputDtoValidation(req.body);
 
       if (errors.length > 0) {
@@ -136,9 +113,7 @@ export const setupApp = (app: Express) => {
   );
 
   // delete video by id
-  app.delete(
-    "/videos/:videoId",
-    (req: RequestWithParams<{ videoId: string }>, res: Response) => {
+  app.delete("/videos/:videoId", (req: RequestWithParams<{ videoId: string }>, res: Response) => {
       const id = +req.params.videoId!;
       const newVideo = db.videos.filter((v) => v.id !== id);
       if (newVideo.length < db.videos.length) {

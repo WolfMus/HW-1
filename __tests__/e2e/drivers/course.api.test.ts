@@ -1,8 +1,7 @@
 import request from "supertest";
-import { setupApp } from "../../src/setup-app";
-import { app } from "../../src/index";
-import { HttpStatus } from "../../src/core/types/types";
-import { VideoUpdateInputDto } from "../../src/videos/types/dto/video.update-dto";
+import { setupApp } from "../../../src/setup-app";
+import { app } from "../../../src/index";
+import { HttpStatus } from "../../../src/core/types/types";
 
 describe("Video API", () => {
   setupApp(app);

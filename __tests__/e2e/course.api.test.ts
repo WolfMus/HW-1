@@ -1,18 +1,21 @@
 import request from "supertest";
 import { setupApp } from "../../src/setup-app";
 import { app } from "../../src/index";
+import { HttpStatus } from "../../src/core/types/types";
+import { VideoUpdateInputDto } from "../../src/videos/types/dto/video.update-dto";
 
-describe("/videos", () => {
+describe("Video API", () => {
   setupApp(app);
+
   beforeAll(async () => {
-    await request(app).delete("/__test__/all-data");
-  });
+    await request(app).delete("/testing/all-data").expect(HttpStatus.NoContent)
+  })
 
   it("Shoud return 200 and video array", async () => {
     await request(app).get("/videos").expect(200, []);
   });
 
-  it("shoud return video by id", async () => {
+  it("shoudn't return video by id", async () => {
     await request(app).get("/videos/11111").expect(404);
   });
 
@@ -26,3 +29,5 @@ describe("/videos", () => {
       });
   });
 });
+
+

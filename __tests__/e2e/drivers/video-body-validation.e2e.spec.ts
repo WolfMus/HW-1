@@ -23,28 +23,37 @@ describe("Videos API body validation check", () => {
       .post("/videos")
       .send({
         ...correctTestVideoData,
-        title: null,
-        author: null,
-        availableResolutions: null,
+        title: null, //null
+        author: null, //null
+        availableResolutions: null, //null
       })
       .expect(HttpStatus.BadRequest);
 
     expect(invalidDataSet1.body.errorsMessages).toHaveLength(3);
 
     const invalidDataSet2 = await request(app)
-        .post('/videos')
-        .send({
-            ...correctTestVideoData,
-            title: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',    //too long
-            author: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',    //too long
-            availableResolutions: ''                                                //length === 0 
-        })
-        .expect(HttpStatus.BadRequest)
+      .post("/videos")
+      .send({
+        ...correctTestVideoData,
+        title: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", //too long
+        author: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", //too long
+        availableResolutions: "", //length === 0
+      })
+      .expect(HttpStatus.BadRequest);
 
-        expect(invalidDataSet2.body.errorsMessages).toHaveLength(3)
+    expect(invalidDataSet2.body.errorsMessages).toHaveLength(3);
 
-        const videosListResponse = await request(app).get("/videos");
-        expect(videosListResponse.body).toHaveLength(0);
+    const invalidDataSet3 = await request(app)
+      .post("/videos")
+      .send({
+        title: 1, //typeof number
+        author: 1, //typeof number
+      })
+      .expect(HttpStatus.BadRequest);
+      
+      expect(invalidDataSet3.body.errorsMessages).toHaveLength(3)
+
+    const videosListResponse = await request(app).get("/videos");
+    expect(videosListResponse.body).toHaveLength(0);
   });
-
 });

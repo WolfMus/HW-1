@@ -1,4 +1,4 @@
-import { FieldErrorType } from "../../videos/types/types/validationError";
+import { FieldErrorType } from "../../videos/types/validationError";
 
 export const createErrorMessage = (
     errors: FieldErrorType[],

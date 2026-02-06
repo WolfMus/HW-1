@@ -1,4 +1,4 @@
-import {VideoType} from '../videos/types/types/videos'
+import {VideoType} from '../videos/types/videos'
 
 export const db = {
     videos: <VideoType[]>[],

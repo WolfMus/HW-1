@@ -1,3 +1,5 @@
+import { FieldErrorType } from "./validationError";
+
 export enum AvailableResolutions {
   P144 = "P144",
   P240 = "P240",
@@ -8,6 +10,11 @@ export enum AvailableResolutions {
   P1440 = "P1440",
   P2160 = "P2160",
 }
+
+export type ApiResponse =
+  | { errorsMessages: FieldErrorType[] }
+  | VideoType[]
+  | VideoType;
 
 export type VideoType = {
   id: number;

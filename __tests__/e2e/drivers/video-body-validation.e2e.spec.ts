@@ -1,8 +1,8 @@
 import request from "supertest";
 import { setupApp } from "../../../src/setup-app.ts";
 import { app } from "../../../src";
-import { VideoInputDto } from "../../../src/videos/types/dto/video.input-dto";
-import { AvailableResolutions } from "../../../src/videos/types/types/videos";
+import { VideoInputDto } from "../../../src/videos/dto/video.input-dto.ts";
+import { AvailableResolutions } from "../../../src/videos/types/videos";
 import { HttpStatus } from "../../../src/core/types/types";
 
 describe("Videos API body validation check", () => {
